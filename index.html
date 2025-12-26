@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2d5016">
+  <meta name="description" content="FOREST - Progressive Web App">
+  <title>FOREST PWA</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232d5016' width='100' height='100'/><text y='75' font-size='70' fill='white'>🌲</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232d5016' width='100' height='100'/><text y='75' font-size='70' fill='white'>🌲</text></svg>">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #2d5016 0%, #4a7c2c 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      text-align: center;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    p {
+      font-size: 1.2em;
+      line-height: 1.6;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .install-prompt {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 30px;
+      text-align: center;
+      display: none;
+    }
+    .install-btn {
+      background: #4a7c2c;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.1em;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: all 0.3s;
+    }
+    .install-btn:hover {
+      background: #5a8c3c;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .status {
+      margin-top: 20px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      font-size: 0.9em;
+      text-align: center;
+    }
+    .features {
+      margin-top: 30px;
+      text-align: left;
+    }
+    .features li {
+      margin: 10px 0;
+      padding-left: 25px;
+      position: relative;
+      list-style: none;
+    }
+    .features li:before {
+      content: "🌲";
+      position: absolute;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌲 FOREST</h1>
+    <p>Vítejte v Progressive Web App</p>
+    
+    <div class="features">
+      <ul>
+        <li>Funguje offline</li>
+        <li>Instalovatelná na zařízení</li>
+        <li>Rychlé načítání</li>
+        <li>Push notifikace</li>
+      </ul>
+    </div>
+    
+    <div class="install-prompt" id="installPrompt">
+      <p>Nainstalujte si FOREST jako aplikaci!</p>
+      <button class="install-btn" id="installBtn">Instalovat aplikaci</button>
+    </div>
+    
+    <div class="status" id="status">Načítání...</div>
+  </div>
+  
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then((registration) => {
+            console.log('Service Worker registered:', registration);
+            updateStatus('✅ Service Worker aktivní - Aplikace funguje offline!');
+          })
+          .catch((error) => {
+            console.error('Service Worker registration failed:', error);
+            updateStatus('❌ Service Worker se nepodařilo zaregistrovat');
+          });
+      });
+    }
+
+    // Install prompt
+    let deferredPrompt;
+    const installPrompt = document.getElementById('installPrompt');
+    const installBtn = document.getElementById('installBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installPrompt.style.display = 'block';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        updateStatus('✅ Aplikace byla nainstalována!');
+      } else {
+        updateStatus('ℹ️ Instalace byla zrušena');
+      }
+      
+      deferredPrompt = null;
+      installPrompt.style.display = 'none';
+    });
+
+    window.addEventListener('appinstalled', () => {
+      updateStatus('✅ Aplikace byla úspěšně nainstalována!');
+      installPrompt.style.display = 'none';
+    });
+
+    // Check if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      updateStatus('✅ Aplikace běží v standalone režimu');
+    }
+
+    function updateStatus(message) {
+      const status = document.getElementById('status');
+      status.textContent = message;
+    }
+
+    // Request notification permission
+    if ('Notification' in window && 'serviceWorker' in navigator) {
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          console.log('Notification permission granted');
+        }
+      });
+    }
+
+    // Initial status
+    updateStatus('✅ PWA připravena k použití');
+  </script>
+</body>
+</html>
