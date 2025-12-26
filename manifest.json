@@ -1,0 +1,35 @@
+{
+  "name": "FOREST Progressive Web App",
+  "short_name": "FOREST",
+  "description": "FOREST - Progressive Web Application",
+  "start_url": "/FOREST-PWA/",
+  "scope": "/FOREST-PWA/",
+  "display": "standalone",
+  "background_color": "#2d5016",
+  "theme_color": "#2d5016",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%232d5016' width='192' height='192'/><text y='140' x='96' text-anchor='middle' font-size='120' fill='white'>🌲</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%232d5016' width='512' height='512'/><text y='380' x='256' text-anchor='middle' font-size='320' fill='white'>🌲</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Otevřít FOREST",
+      "short_name": "Otevřít",
+      "description": "Otevřít hlavní stránku",
+      "url": "/FOREST-PWA/",
+      "icons": [{ "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%232d5016' width='192' height='192'/><text y='140' x='96' text-anchor='middle' font-size='120' fill='white'>🌲</text></svg>", "sizes": "192x192" }]
+    }
+  ]
+}
